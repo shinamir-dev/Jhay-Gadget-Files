@@ -15,5 +15,11 @@ export const SidebarData = [
     path: '/dashboard/inventory',
     icon: <FaIcons.FaBox />,
     cName: 'nav-text'
+  },
+  {
+    title: 'Stocks',
+    path: '/dashboard/units',
+    icon: <FaIcons.FaBox />,
+    cName: 'nav-text'
   }
 ];
