@@ -2,18 +2,26 @@ const db = require('../config/db.js');
 
 exports.addUnit = (req, res) => {
     const { product_id, color_id, quantity, item_condition } = req.body;
-    const sql = `INSERT INTO inventory_units(product_id, color_id, quantity, item_condition)
-    VALUES (?, ?, ?, ?)`;
+    let status = "available";
+    if (Number(quantity) === 0) {
+        status = "no stock";
+    }
 
-    db.query(sql, [product_id, color_id, quantity, item_condition], (error, result) => {
+    const sql = `
+        INSERT INTO inventory_units(product_id, color_id, quantity, item_condition, status)
+        VALUES (?, ?, ?, ?, ?)
+    `;
+
+    db.query(sql, [product_id, color_id, quantity, item_condition, status], (error, result) => {
         if (error) {
             return res.status(500).json(error);
         }
 
         res.json({
-            message:'Unit added successfully!'
-        })
-    })
+            message: 'Unit added successfully!',
+            status: status 
+        });
+    });
 }
 
 exports.getSummary = (req, res) => {
@@ -59,5 +67,56 @@ exports.getSummary = (req, res) => {
     });
 
     res.json(Object.values(sheet));
+  });
+};
+
+exports.getAllUnits = (req, res) => {
+  const sql = `
+    SELECT 
+        p.product_id,
+        p.name,
+        p.model,
+        p.storage,
+        p.image,
+        COALESCE(c.color_name, 'Unknown') AS color_name,
+        COALESCE(i.quantity, 0) AS quantity,
+        COALESCE(i.status, 'not_assigned') AS status
+    FROM products p
+    LEFT JOIN inventory_units i
+        ON p.product_id = i.product_id
+    LEFT JOIN colors c
+        ON i.color_id = c.color_id
+    ORDER BY p.name, p.model, c.color_name
+  `;
+
+  db.query(sql, (err, result) => {
+    if (err) return res.status(500).json(err);
+
+    const summary = {};
+
+    result.forEach((r) => {
+      if (!summary[r.product_id]) {
+        summary[r.product_id] = {
+          product_id: r.product_id, // IMPORTANT FIX
+          name: r.name,
+          model: r.model,
+          storage: r.storage,
+          image: r.image,
+          total: 0,
+          units: []
+        };
+      }
+
+      const unitInfo = {
+        color: r.color_name,
+        quantity: Number(r.quantity),
+        status: r.status
+      };
+
+      summary[r.product_id].units.push(unitInfo);
+      summary[r.product_id].total += Number(r.quantity);
+    });
+
+    res.json(Object.values(summary));
   });
 };

@@ -31,7 +31,7 @@ export const login = async (userData) => {
       credentials: 'include',
       body: JSON.stringify(userData),
     });
-
+    
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error || 'An error occurred');

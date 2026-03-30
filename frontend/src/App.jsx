@@ -23,7 +23,7 @@ function App() {
         }else{
           setIsAuthenticated(false);
         }
-
+        
       } catch (error) {
         setIsAuthenticated(false);
       }
@@ -43,15 +43,27 @@ function App() {
         <Routes>
           <Route
             path='/'
-            element={isAuthenticated ? <Navigate to="/dashboard"/>:<Login setIsAuthenticated={setIsAuthenticated} />}
+            element={
+              isAuthenticated
+                ? <Navigate to="/dashboard" replace />
+                : <Login setIsAuthenticated={setIsAuthenticated} />
+            }
           />
           <Route
             path='/login'
-            element={isAuthenticated ? <Navigate to="/dashboard"/>:<Login setIsAuthenticated={setIsAuthenticated} />}
+            element={
+              isAuthenticated
+                ? <Navigate to="/dashboard" replace />
+                : <Login setIsAuthenticated={setIsAuthenticated} />
+            }
           />
           <Route
             path="/dashboard/*"
-            element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
+            element={
+              isAuthenticated
+                ? <Dashboard />
+                : <Navigate to="/login" replace />
+            }
           />
         </Routes>
 

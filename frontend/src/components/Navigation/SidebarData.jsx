@@ -17,6 +17,12 @@ export const SidebarData = [
     cName: 'nav-text'
   },
   {
+    title: 'Point of Sale',
+    path: '/dashboard/pos',
+    icon: <MdIcons.MdOutlinePointOfSale />,
+    cName: 'nav-text'
+  },
+  {
     title: 'Settings',
     path: '/dashboard/units',
     icon: <IoIcons.IoMdSettings />,

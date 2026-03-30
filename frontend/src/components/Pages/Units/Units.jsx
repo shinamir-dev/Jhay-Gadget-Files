@@ -20,7 +20,7 @@ function Units() {
 
   // ✅ PRODUCT WITH IMAGE
   const [productForm, setProductForm] = useState({
-    name: "",
+    name: "iPhone",
     model: "",
     storage: "",
     image: null
@@ -122,7 +122,7 @@ function Units() {
       await createProduct(formData);
 
       setProductForm({
-        name: "",
+        name: "iPhone",
         model: "",
         storage: "",
         image: null
@@ -232,7 +232,7 @@ function Units() {
               <option value="">Select Product</option>
               {products.map((p) => (
                 <option key={p.product_id} value={p.product_id}>
-                  {p.name} - {p.model}
+                  {p.name} - {p.model} - {p.storage}
                 </option>
               ))}
             </select>

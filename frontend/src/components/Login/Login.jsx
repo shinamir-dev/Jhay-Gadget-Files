@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { replace, useNavigate } from 'react-router-dom';
 import '../Login/Login.css';
 import { login } from "../../api/authAPI";
 
@@ -21,7 +21,7 @@ function Login({ setIsAuthenticated }) {
             setSuccessMessage('Login Successfully!');
             setIsAuthenticated(true); 
             console.log('Login successful');
-            navigate('/dashboard');
+            navigate('/dashboard', { replace: true});
         } catch (err) {
             setError(err.message || 'An error occurred');
         } finally {

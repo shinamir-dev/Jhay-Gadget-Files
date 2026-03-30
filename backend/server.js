@@ -12,7 +12,7 @@ const paymentRoutes = require('./routes/paymentRoutes.js')
 const app = express();
 
 app.use(cors({
-  origin: true,
+  origin: 'http://192.168.1.189:5173',
   credentials: true
 }));
 
