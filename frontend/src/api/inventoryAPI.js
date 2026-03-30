@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/inventory'
+const API_URL = 'http://192.168.1.189:5000/api/inventory'
 
 export const getSummary = async (status = "available") => {
     try {

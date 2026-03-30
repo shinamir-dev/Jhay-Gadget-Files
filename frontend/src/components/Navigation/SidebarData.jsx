@@ -17,9 +17,9 @@ export const SidebarData = [
     cName: 'nav-text'
   },
   {
-    title: 'Stocks',
+    title: 'Settings',
     path: '/dashboard/units',
-    icon: <FaIcons.FaBox />,
+    icon: <IoIcons.IoMdSettings />,
     cName: 'nav-text'
   }
 ];

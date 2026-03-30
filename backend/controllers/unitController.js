@@ -1,21 +1,26 @@
 const db = require('../config/db.js');
 
 exports.createProduct = (req, res) => {
-    const { name, model, storage} = req.body;
+    const { name, model, storage } = req.body;
+    const image = req.file ? req.file.filename : null;
 
-    const sql = `INSERT INTO products (name, model, storage) VALUES (?, ?, ?)`;
+    const sql = `
+        INSERT INTO products (name, model, storage, image) 
+        VALUES (?, ?, ?, ?)
+    `;
 
-    db.query(sql, [name, model, storage], (error, result) => {
+    db.query(sql, [name, model, storage, image], (error, result) => {
         if (error) {
             return res.status(500).json(error);
         }
 
         res.json({
             message: 'Product unit created!',
-            product_id: result.insertId
-        })
-    })
-}
+            product_id: result.insertId,
+            image: image
+        });
+    });
+};
 
 exports.createColor = (req, res) => {
     const { color_name } = req.body;
@@ -28,7 +33,7 @@ exports.createColor = (req, res) => {
 
         res.json({
             message: "Color added successfully!",
-            color_id: result.insert
+            color_id: result.insertId
         })
     })
 }
