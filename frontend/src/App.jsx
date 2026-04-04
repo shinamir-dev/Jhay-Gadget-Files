@@ -13,7 +13,7 @@ function App() {
     const checkAuth = async () => {
       try {
 
-        const res = await fetch('http://192.168.1.189:5000/api/auth/me', {
+        const res = await fetch('http://192.168.1.252:5000/api/auth/me', {
           method: 'GET',
           credentials: 'include'
         });
