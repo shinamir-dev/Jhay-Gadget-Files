@@ -44,7 +44,7 @@ export default function Cashier() {
       <h1>POS Transaction</h1>
 
       <div className="pos-card">
-        <img src={product.image} alt={product.name} />
+        <img src={`http://192.168.1.252:5000/uploads/products/${product.image}`} alt={product.name} />
 
         <div className="pos-details">
           <h2>{product.name}</h2>

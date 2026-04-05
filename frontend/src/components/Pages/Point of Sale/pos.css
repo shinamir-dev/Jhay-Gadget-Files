@@ -33,10 +33,14 @@
   border-color: var(--accent);
 }
 
+/* ✅ FIXED IMAGE STYLE */
 .product-image {
   width: 100%;
   height: 220px;
-  object-fit: cover;
+  object-fit: contain;        /* 🔥 show full image */
+  background: #0f172a;        /* fills empty space */
+  padding: 12px;              /* spacing around image */
+  display: block;
 }
 
 .product-info {
@@ -59,4 +63,49 @@
   margin-top: 0.5rem;
   color: var(--accent);
   font-weight: 600;
+}
+
+/* Optional: unit buttons styling (cleaner look) */
+.product-variants {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.unit-btn {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.unit-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Search Bar Container */
+.search-bar-container {
+  max-width: 400px;
+  margin: 0 auto 1.5rem auto;
+}
+
+.search-bar {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.search-bar:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0,123,255,0.3);
 }
