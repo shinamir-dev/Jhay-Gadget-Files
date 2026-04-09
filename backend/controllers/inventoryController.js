@@ -1,18 +1,18 @@
 const db = require('../config/db.js');
 
 exports.addUnit = (req, res) => {
-    const { product_id, color_id, quantity, item_condition } = req.body;
+    const { product_id, color_id, quantity, item_condition, mop_id } = req.body;
     let status = "available";
     if (Number(quantity) === 0) {
         status = "no stock";
     }
 
     const sql = `
-        INSERT INTO inventory_units(product_id, color_id, quantity, item_condition, status)
+        INSERT INTO inventory_units(product_id, color_id, quantity, item_condition, status, mop_id)
         VALUES (?, ?, ?, ?, ?)
     `;
 
-    db.query(sql, [product_id, color_id, quantity, item_condition, status], (error, result) => {
+    db.query(sql, [product_id, color_id, quantity, item_condition, status, mop_id], (error, result) => {
         if (error) {
             return res.status(500).json(error);
         }
@@ -97,7 +97,7 @@ exports.getAllUnits = (req, res) => {
     result.forEach((r) => {
       if (!summary[r.product_id]) {
         summary[r.product_id] = {
-          product_id: r.product_id, // IMPORTANT FIX
+          product_id: r.product_id, 
           name: r.name,
           model: r.model,
           storage: r.storage,
@@ -119,4 +119,49 @@ exports.getAllUnits = (req, res) => {
 
     res.json(Object.values(summary));
   });
+};
+
+exports.saleUnit = (req, res) => {
+    const { product_id, color_id, quantity, payment_method } = req.body;
+
+    const checkSql = `
+        SELECT quantity 
+        FROM inventory_units 
+        WHERE product_id = ? AND color_id = ?
+    `;
+
+    db.query(checkSql, [product_id, color_id], (err, results) => {
+        if (err) return res.status(500).json(err);
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: "Item not found" });
+        }
+
+        const currentQty = results[0].quantity;
+
+        if (currentQty < quantity) {
+            return res.status(400).json({
+                message: "Not enough stock",
+                currentQty
+            });
+        }
+
+        const newQty = currentQty - quantity;
+        const newStatus = newQty === 0 ? "no stock" : "available";
+        const updateSql = `
+            UPDATE inventory_units
+            SET quantity = ?, status = ?
+            WHERE product_id = ? AND color_id = ?
+        `;
+
+        db.query(updateSql, [newQty, newStatus, product_id, color_id, payment_method], (error, result) => {
+            if (error) return res.status(500).json(error);
+
+            res.json({
+                message: "Stock deducted successfully",
+                remaining: newQty,
+                status: newStatus
+            });
+        });
+    });
 };

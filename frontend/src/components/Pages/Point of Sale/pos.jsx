@@ -6,7 +6,7 @@ export default function Pos() {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState(""); // <-- new state
+  const [searchTerm, setSearchTerm] = useState(""); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export default function Pos() {
     } else {
       const term = searchTerm.toLowerCase();
       const filtered = products.filter((product) => 
-        product.name.toLowerCase().includes(term) ||       // exact sequence
+        product.name.toLowerCase().includes(term) ||    
         product.model.toLowerCase().includes(term) ||
         product.storage.toLowerCase().includes(term)
       );
@@ -78,16 +78,19 @@ export default function Pos() {
                 <span>Qty: {product.total}</span>
 
                 {product.units?.length > 0 && (
+                  
                   <div className="product-variants">
-                    {product.units.map((unit, idx) => (
-                      <button
-                        key={idx}
-                        className="unit-btn"
-                        onClick={() => openPOS(product, unit)}
-                      >
-                        {unit.color} ({unit.quantity})
-                      </button>
-                    ))}
+                    {product.units.map((unit, idx) => {
+                      return (
+                        <button
+                          key={idx}
+                          className="unit-btn"
+                          onClick={() => openPOS(product, unit)}
+                        >
+                          {unit.color} ({unit.quantity})
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>

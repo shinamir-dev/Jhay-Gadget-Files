@@ -23,6 +23,12 @@ export const SidebarData = [
     cName: 'nav-text'
   },
   {
+    title: 'Summary Sales',
+    path: '/dashboard/sales',
+    icon: <FaIcons.FaMoneyBill/>,
+    cName: 'nav-text'
+  },
+  {
     title: 'Settings',
     path: '/dashboard/units',
     icon: <IoIcons.IoMdSettings />,

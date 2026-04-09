@@ -31,7 +31,7 @@ function Units() {
   });
 
   const [paymentForm, setPaymentForm] = useState({
-    mode_name: ""
+    payment_method: ""
   });
 
   const [products, setProducts] = useState([]);
@@ -164,7 +164,7 @@ function Units() {
         text: res.message
       });
 
-      setPaymentForm({ mode_name: "" });
+      setPaymentForm({ payment_method: "" });
       fetchData();
     } catch {
       setModal({
@@ -218,7 +218,7 @@ function Units() {
         <div className="add-unit-form">
           <h3>Add Payment Mode</h3>
           <form onSubmit={handleCreatePayment}>
-            <input name="mode_name" placeholder="GCash, Cash, etc." value={paymentForm.mode_name} onChange={handlePaymentChange} required />
+            <input name="payment_method" placeholder="GCash, Cash, etc." value={paymentForm.payment_method} onChange={handlePaymentChange} required />
             <button type="submit">Add Payment Mode</button>
           </form>
         </div>

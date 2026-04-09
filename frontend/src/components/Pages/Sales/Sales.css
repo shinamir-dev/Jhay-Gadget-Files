@@ -1,0 +1,164 @@
+.date-label {
+  text-align: center;
+  margin-bottom: 0.5rem;
+  color: #9aa0a6;
+}
+
+/* FILTER */
+.filter-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.filter-bar input {
+  padding: 6px;
+}
+
+/* PRINT BUTTON */
+.print-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  background: #4caf50;
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+/* METRICS INLINE */
+.metrics-inline {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.metrics-inline div {
+  margin-right: 10px;
+}
+
+/* SUMMARY INLINE */
+.summary-inline {
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed #333;
+  padding: 3px 0;
+}
+
+/* LIST */
+.sales-list {
+  font-size: 12px;
+}
+
+.sale-item {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #2a2a2a;
+  padding: 5px 0;
+}
+
+.sale-main {
+  display: flex;
+  flex-direction: column;
+}
+
+.sale-meta {
+  font-size: 11px;
+  color: #9aa0a6;
+}
+
+.sale-side {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.sale-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 2px solid #444;
+  font-weight: bold;
+}
+
+/* TAGS */
+.tag {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.badge-cash { background: #204d2c; color: #7dffb1; }
+.badge-card { background: #1b3d5f; color: #7cc4ff; }
+.badge-gcash { background: #3a2c63; color: #c5b4ff; }
+.badge-other { background: #5a4a1f; color: #ffe48c; }
+
+/* STATES */
+.empty {
+  text-align: center;
+  color: #9aa0a6;
+}
+
+.error {
+  color: red;
+  text-align: center;
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+  .filter-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sale-side {
+    flex-wrap: wrap;
+  }
+}
+
+/* PRINT (PDF OPTIMIZED) */
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  .filter-bar,
+  .print-btn {
+    display: none;
+  }
+
+  .sale-item {
+    font-size: 11px;
+    padding: 3px 0;
+  }
+
+  .summary-row {
+    font-size: 11px;
+  }
+
+  h1 {
+    font-size: 18px;
+  }
+
+  h2 {
+    font-size: 14px;
+    margin-top: 8px;
+  }
+
+  .tag {
+    background: none !important;
+    color: #000 !important;
+    border: 1px solid #000;
+  }
+}

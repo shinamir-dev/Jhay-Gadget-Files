@@ -5,6 +5,7 @@ import Inventory from '../Pages/Inventory/Inventory';
 import Units from '../Pages/Units/Units';
 import Pos from '../Pages/Point of Sale/pos';
 import Cashier from '../Pages/Point of Sale/Cashier';
+import Sales from '../Pages/Sales/Sales';
 
 function Dashboard() {
     return (
@@ -17,6 +18,8 @@ function Dashboard() {
                     <Route path='/units' element={<Units />} />
                     <Route path='/pos' element={<Pos />}/>
                     <Route path='/cashier/:product_id/:color_id' element={<Cashier />}/>
+                    <Route path='/sales' element={<Sales />}/>
+
                 </Routes>
             </div>
         </>
