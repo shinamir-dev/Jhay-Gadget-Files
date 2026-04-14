@@ -122,8 +122,7 @@ exports.getAllUnits = (req, res) => {
 };
 
 exports.saleUnit = (req, res) => {
-    const { product_id, color_id, quantity, payment_method } = req.body;
-
+    const { product_id, color_id, quantity, total } = req.body;
     const checkSql = `
         SELECT quantity 
         FROM inventory_units 
@@ -148,20 +147,45 @@ exports.saleUnit = (req, res) => {
 
         const newQty = currentQty - quantity;
         const newStatus = newQty === 0 ? "no stock" : "available";
+
         const updateSql = `
             UPDATE inventory_units
             SET quantity = ?, status = ?
             WHERE product_id = ? AND color_id = ?
         `;
 
-        db.query(updateSql, [newQty, newStatus, product_id, color_id, payment_method], (error, result) => {
+        db.query(updateSql, [newQty, newStatus, product_id, color_id], (error) => {
             if (error) return res.status(500).json(error);
 
-            res.json({
-                message: "Stock deducted successfully",
-                remaining: newQty,
-                status: newStatus
+            console.log({
+                product_id,
+                color_id,
+                quantity,
+                total,
+                SOLD_STATUS_ID
             });
+
+            const insertSaleSql = `
+                INSERT INTO sales (product_id, color_id, quantity, total, status_id)
+                VALUES (?, ?, ?, ?, ?)
+            `;
+
+            const SOLD_STATUS_ID = 2;
+
+                
+            db.query(
+                insertSaleSql,
+                [product_id, color_id, quantity, total, SOLD_STATUS_ID],
+                (err2, result2) => {
+                    if (err2) return res.status(500).json(err2);
+                    res.json({
+                        message: "Sale completed successfully",
+                        remaining: newQty,
+                        status: newStatus
+                    });
+                    
+                }
+            );
         });
     });
 };

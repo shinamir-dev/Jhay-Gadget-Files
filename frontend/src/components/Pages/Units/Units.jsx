@@ -222,8 +222,6 @@ function Units() {
             <button type="submit">Add Payment Mode</button>
           </form>
         </div>
-
-        {/* ===== ADD UNIT ===== */}
         <div className="add-unit-form">
           <h3>Add Inventory Unit</h3>
           <form onSubmit={handleSubmit}>

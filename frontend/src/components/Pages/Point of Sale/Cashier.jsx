@@ -10,14 +10,17 @@ export default function Cashier() {
 
   const [data, setData] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [payment, setPayment] = useState(""); // For Cash-only
   const [paymentMethods, setPaymentMethods] = useState([]);
-  const [mopId, setMopId] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Split payments when method is not Cash
-  const [payments, setPayments] = useState({ cash: "", finance: "" });
+  // 🔥 Upgrade modal state
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [selectedUpgrade, setSelectedUpgrade] = useState("");
+
+  const [payments, setPayments] = useState([
+    { mop_id: "", amount: "" }
+  ]);
 
   useEffect(() => {
     if (product && unit) {
@@ -48,10 +51,23 @@ export default function Cashier() {
     try {
       const res = await axios.get("http://192.168.1.252:5000/api/payment/get");
       setPaymentMethods(res.data);
-      if (res.data.length > 0) setMopId(res.data[0].mop_id);
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const addPaymentField = () => {
+    setPayments([...payments, { mop_id: "", amount: "" }]);
+  };
+
+  const removePaymentField = (index) => {
+    setPayments(payments.filter((_, i) => i !== index));
+  };
+
+  const updatePaymentField = (index, field, value) => {
+    const updated = [...payments];
+    updated[index][field] = value;
+    setPayments(updated);
   };
 
   if (!product || !unit) return <div>No product selected.</div>;
@@ -59,48 +75,39 @@ export default function Cashier() {
 
   const total = Number(data.price) * Number(quantity);
 
+  const totalEntered = payments.reduce(
+    (sum, p) => sum + Number(p.amount || 0),
+    0
+  );
+
+  const change = totalEntered > total ? totalEntered - total : 0;
+
   const handleCheckout = async () => {
     if (quantity <= 0 || quantity > data.quantity) {
       alert("Invalid quantity or exceeds stock!");
       return;
     }
 
-    let paymentData = [];
-    const selectedMop = paymentMethods.find((m) => m.mop_id === mopId);
-    if (!selectedMop) return alert("Please select a payment method!");
+    if (totalEntered <= 0) {
+      alert("Enter at least one payment!");
+      return;
+    }
 
-    if (selectedMop.payment_method === "Cash") {
-      if (!payment || Number(payment) <= 0) return alert("Enter valid payment!");
+    if (totalEntered < total) {
+      alert("Payment is less than total!");
+      return;
+    }
+
+    let paymentData = [];
+
+    for (let pay of payments) {
+      if (!pay.mop_id || Number(pay.amount) <= 0) continue;
+
       paymentData.push({
-        mop_id: mopId,
-        amount: Number(payment),
+        mop_id: pay.mop_id,
+        amount: Number(pay.amount),
         finance: null,
       });
-    } else {
-      const cashAmount = Number(payments.cash || 0);
-      const financeAmount = Number(payments.finance || 0);
-
-      if (cashAmount + financeAmount <= 0)
-        return alert("Enter cash or finance amount!");
-
-      if (cashAmount > 0) {
-        const cashMop = paymentMethods.find((m) => m.payment_method === "Cash");
-        if (cashMop) {
-          paymentData.push({
-            mop_id: cashMop.mop_id,
-            amount: cashAmount,
-            finance: null,
-          });
-        }
-      }
-
-      if (financeAmount > 0) {
-        paymentData.push({
-          mop_id: mopId,
-          amount: 0,
-          finance: financeAmount,
-        });
-      }
     }
 
     try {
@@ -112,16 +119,19 @@ export default function Cashier() {
           color_id: data.color_id,
           quantity,
           total,
+          upgrade: selectedUpgrade || null, // 🔥 send upgrade
           payments: paymentData,
         }
       );
 
       alert(response.data.message);
       setSuccess(true);
+
       fetchUnitDetails();
       setQuantity(1);
-      setPayment("");
-      setPayments({ cash: "", finance: "" });
+      setPayments([{ mop_id: "", amount: "" }]);
+      setSelectedUpgrade("");
+
     } catch (err) {
       console.error(err);
       alert("Checkout failed!");
@@ -149,15 +159,18 @@ export default function Cashier() {
           <p>Available Stock: {data.quantity}</p>
           <p>Price: ₱{Number(data.price) || 0}</p>
 
+          {/* ✅ Show selected upgrade */}
+          {selectedUpgrade && (
+            <p style={{ color: "#facc15" }}>
+              Upgrade: {selectedUpgrade}
+            </p>
+          )}
+
           <div className="pos-inputs">
             <label>Quantity:</label>
+
             <div className="qty-control">
-              <button
-                type="button"
-                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              >
-                −
-              </button>
+              <button onClick={() => setQuantity((q) => Math.max(1, q - 1))}>−</button>
 
               <input
                 type="number"
@@ -172,67 +185,63 @@ export default function Cashier() {
                 }}
               />
 
-              <button
-                type="button"
-                onClick={() =>
-                  setQuantity((q) => Math.min(data.quantity, q + 1))
-                }
-              >
-                +
-              </button>
+              <button onClick={() =>
+                setQuantity((q) => Math.min(data.quantity, q + 1))
+              }>+</button>
             </div>
 
-            {/* Payment inputs */}
-            {paymentMethods.find((m) => m.mop_id === mopId)?.payment_method ===
-            "Cash" ? (
-              <>
-                <label>Payment Amount:</label>
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="Enter payment amount"
-                  value={payment}
-                  onChange={(e) => setPayment(e.target.value)}
-                />
-              </>
-            ) : (
-              <div className="additional-payments">
-                <label>Cash Payment:</label>
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="Enter cash amount"
-                  value={payments.cash}
-                  onChange={(e) =>
-                    setPayments((prev) => ({ ...prev, cash: e.target.value }))
-                  }
-                />
+            {/* 🔘 Upgrade Button */}
+            <button
+              className="upgrade-btn"
+              onClick={() => setShowUpgradeModal(true)}
+            >
+              ⬆ Upgrade
+            </button>
 
-                <label>Finance Payment:</label>
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="Enter finance amount"
-                  value={payments.finance}
-                  onChange={(e) =>
-                    setPayments((prev) => ({ ...prev, finance: e.target.value }))
-                  }
-                />
-              </div>
-            )}
+            {/* Payments */}
+            <div className="additional-payments">
+              <label>Payments:</label>
 
-            <label>Payment Method:</label>
-            <select value={mopId} onChange={(e) => setMopId(Number(e.target.value))}>
-              {paymentMethods.map((method) => (
-                <option key={method.mop_id} value={method.mop_id}>
-                  {method.payment_method}
-                </option>
+              {payments.map((pay, index) => (
+                <div key={index} className="payment-row">
+                  <select
+                    value={pay.mop_id}
+                    onChange={(e) =>
+                      updatePaymentField(index, "mop_id", Number(e.target.value))
+                    }
+                  >
+                    <option value="">Select Method</option>
+                    {paymentMethods.map((method) => (
+                      <option key={method.mop_id} value={method.mop_id}>
+                        {method.payment_method}
+                      </option>
+                    ))}
+                  </select>
+
+                  <input
+                    type="number"
+                    placeholder="Amount"
+                    value={pay.amount}
+                    onChange={(e) =>
+                      updatePaymentField(index, "amount", e.target.value)
+                    }
+                  />
+
+                  {payments.length > 1 && (
+                    <button onClick={() => removePaymentField(index)}>❌</button>
+                  )}
+                </div>
               ))}
-            </select>
-          </div>
 
-          <div className="pos-summary">
-            <p>Total: ₱{total}</p>
+              <button onClick={addPaymentField}>➕ Add Payment</button>
+            </div>
+
+            {/* Summary */}
+            <div className="pos-summary">
+              <p>Total: ₱{total}</p>
+              <p>Total Paid: ₱{totalEntered}</p>
+              {change > 0 && <p>Change: ₱{change}</p>}
+            </div>
           </div>
 
           {!success ? (
@@ -252,6 +261,40 @@ export default function Cashier() {
           </button>
         </div>
       </div>
+
+      {/* 🪟 UPGRADE MODAL */}
+      {showUpgradeModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>Upgrade Product</h2>
+
+            <select
+              value={selectedUpgrade}
+              onChange={(e) => setSelectedUpgrade(e.target.value)}
+            >
+              <option value="">Select Upgrade</option>
+              <option value="Premium">Premium</option>
+              <option value="Pro">Pro</option>
+            </select>
+
+            <div className="modal-actions">
+              <button
+                className="confirm-btn"
+                onClick={() => setShowUpgradeModal(false)}
+              >
+                Confirm
+              </button>
+
+              <button
+                className="cancel-btn"
+                onClick={() => setShowUpgradeModal(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

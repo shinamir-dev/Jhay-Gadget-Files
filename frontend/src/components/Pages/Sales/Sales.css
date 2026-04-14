@@ -114,6 +114,29 @@
   text-align: center;
 }
 
+/* EXPENSE SECTION */
+
+.expenses-section {
+  margin-top: 12px;
+  font-size: 12px;
+}
+
+.expense-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed #333;
+  padding: 4px 0;
+}
+
+.expense-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 2px solid #444;
+  font-weight: bold;
+}
+
 /* MOBILE */
 @media (max-width: 600px) {
   .filter-bar {

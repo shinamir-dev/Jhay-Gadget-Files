@@ -9,7 +9,7 @@ const unitRoutes = require('./routes/unitRoutes.js');
 const inventoryRoutes = require('./routes/inventoryRoute.js');
 const paymentRoutes = require('./routes/paymentRoutes.js')
 const saleUnitRoute = require('./routes/saleUnitRoute.js');
-
+const expenseRoute = require('./routes/expenseRoutes.js');
 const app = express();
 
 app.use(cors({
@@ -35,6 +35,7 @@ app.use('/api/unit', unitRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/payment', paymentRoutes)
 app.use('/api/sale', saleUnitRoute)
+app.use('/api/expense', expenseRoute);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.listen(5000, '0.0.0.0', () => {

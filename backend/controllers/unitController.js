@@ -55,3 +55,27 @@ exports.getColors = (req, res) => {
         res.json(result);
     });
 };
+
+exports.getStatus = (req, res) => {
+    const sql = `SELECT status_id, status FROM modification`;
+    db.query(sql, (error, result) => {
+        if (error) return res.status(500).json(error);
+        res.json(result);
+    }); 
+}
+
+exports.addStatus = (req, res) => {
+    const { status } = req.body;
+    const sql = `INSERT INTO modification (status) VALUES (?)`;
+
+    db.query(sql, [status], (error, result) => {
+        if (error) {
+            return res.status(500).json(error);
+        }
+
+        res.json({
+            message: 'Status Added Successfully!',
+            status_id: result.insertId
+        })
+    })
+}

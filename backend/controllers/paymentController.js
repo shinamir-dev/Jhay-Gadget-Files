@@ -61,7 +61,7 @@ exports.getUnitDetails = (req, res) => {
 
 exports.checkoutSale = (req, res) => {
     const { product_id, color_id, quantity, total, payments } = req.body;
-
+    console.log(payments)
     const saleSql = `
         INSERT INTO sales 
         (product_id, color_id, quantity, total)

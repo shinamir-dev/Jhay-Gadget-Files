@@ -46,11 +46,24 @@ function Inventory() {
         setStatus(type);
     };
 
+    // ✅ PRINT FUNCTION
+    const handlePrint = () => {
+        window.print();
+    };
+
     return (
         <div className="report-table">
-            <h2 className="h2-report">
-                JHAY GADGET INVENTORY ({status.toUpperCase()})
-            </h2>
+
+            {/* HEADER */}
+            <div className="header-row">
+                <h2 className="h2-report">
+                    JHAY GADGET INVENTORY ({status.toUpperCase()})
+                </h2>
+
+                <button className="print-btn" onClick={handlePrint}>
+                    Print / Save PDF
+                </button>
+            </div>
 
             <div className="category-buttons">
                 <button onClick={() => handleButtonCategory("available")}>
@@ -64,7 +77,6 @@ function Inventory() {
                 </button>
             </div>
 
-            {/* ✅ FIX: Proper scroll wrapper */}
             <div className="table-wrapper">
                 <div className="table-scroll">
                     <table className="table-report">
@@ -93,7 +105,6 @@ function Inventory() {
                                 </tr>
                             ))}
 
-                            {/* Overall Total Row */}
                             <tr className="total-row">
                                 <td>Overall Total</td>
 
@@ -112,6 +123,7 @@ function Inventory() {
                     </table>
                 </div>
             </div>
+
         </div>
     );
 }

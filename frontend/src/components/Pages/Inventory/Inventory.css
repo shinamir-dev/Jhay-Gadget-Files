@@ -333,6 +333,32 @@
   text-transform: uppercase;
 }
 
+/* ===== PDF FIXES ===== */
+
+/* Prevent scroll cut in PDF */
+.table-scroll {
+  overflow: visible !important;
+}
+
+/* Button styling */
+.print-btn {
+  margin-left: auto;
+  padding: 0.4rem 1rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  transition: 0.2s;
+}
+
+.print-btn:hover {
+  opacity: 0.85;
+}
+
 /* ===== ANIMATIONS ===== */
 @keyframes slideUp {
   from { transform: translateY(14px); opacity: 0; }
