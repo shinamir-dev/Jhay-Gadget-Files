@@ -1,69 +1,107 @@
 const db = require('../config/db.js');
 
 exports.addUnit = (req, res) => {
-    const { product_id, color_id, quantity, item_condition, mop_id } = req.body;
+    const {
+        product_id,
+        color_id,
+        quantity,
+        item_condition,
+    } = req.body;
+
+    console.log(req.body);
+
     let status = "available";
+
     if (Number(quantity) === 0) {
         status = "no stock";
     }
 
     const sql = `
-        INSERT INTO inventory_units(product_id, color_id, quantity, item_condition, status, mop_id)
+        INSERT INTO inventory_units
+        (product_id, color_id, quantity, item_condition, status)
         VALUES (?, ?, ?, ?, ?)
     `;
 
-    db.query(sql, [product_id, color_id, quantity, item_condition, status, mop_id], (error, result) => {
-        if (error) {
-            return res.status(500).json(error);
-        }
+    db.query(
+        sql,
+        [
+            product_id,
+            color_id,
+            quantity,
+            item_condition,
+            status,
+        ],
+        (error, result) => {
+            if (error) {
+                return res.status(500).json(error);
+            }
 
-        res.json({
-            message: 'Unit added successfully!',
-            status: status 
-        });
-    });
-}
+            res.json({
+                message: "Unit added successfully!",
+                status
+            });
+        }
+    );
+};
 
 exports.getSummary = (req, res) => {
-  const status = req.query.status || "available";
+  const filter = req.query.status || "preowned";
+
+  let conditionQuery = "";
+  let values = [];
+
+
+  if (filter === "preowned") {
+    conditionQuery = "AND i.item_condition = 'PREOWNED'";
+  } 
+  else if (filter === "brandnew") {
+    conditionQuery = "AND i.item_condition = 'BRAND NEW'";
+  } 
+  else if (filter === "android") {
+    conditionQuery = "AND i.item_condition = 'ANDROID'";
+  }
 
   const sql = `
     SELECT 
-        CONCAT(p.name,' ',p.model,' ',p.storage) AS unit,
-        COALESCE(c.color_name, 'Unknown') AS color_name,
-        COALESCE(SUM(i.quantity), 0) AS stock
+      CONCAT(p.name,' ',p.model,' ',p.storage) AS unit,
+      COALESCE(c.color_name, 'Unknown') AS color_name,
+      COALESCE(SUM(i.quantity), 0) AS stock
 
-        FROM products p
+    FROM products p
 
-        LEFT JOIN inventory_units i
-        ON p.product_id = i.product_id
-        AND i.status = ?
+    LEFT JOIN inventory_units i
+      ON p.product_id = i.product_id
+      ${conditionQuery}
 
-        LEFT JOIN colors c
-        ON i.color_id = c.color_id
+    LEFT JOIN colors c
+      ON i.color_id = c.color_id
 
-        GROUP BY p.product_id, c.color_id
-        HAVING SUM(i.quantity) > 0
+    GROUP BY p.product_id, c.color_id
+    HAVING SUM(i.quantity) > 0
 
     ORDER BY p.name
   `;
 
-  db.query(sql, [status], (err, result) => {
+  db.query(sql, values, (err, result) => {
     if (err) {
+      console.error("Error fetching summary:", err);
       return res.status(500).json(err);
     }
 
     const sheet = {};
 
     result.forEach(r => {
-    if (!sheet[r.unit]) {
-        sheet[r.unit] = { unit: r.unit, total: 0 };
-    }
+      if (!sheet[r.unit]) {
+        sheet[r.unit] = {
+          unit: r.unit,
+          total: 0
+        };
+      }
 
-    const stock = Number(r.stock) || 0;
+      const stock = Number(r.stock) || 0;
 
-    sheet[r.unit][r.color_name] = stock;
-    sheet[r.unit].total += stock;
+      sheet[r.unit][r.color_name] = stock;
+      sheet[r.unit].total += stock;
     });
 
     res.json(Object.values(sheet));
@@ -80,14 +118,15 @@ exports.getAllUnits = (req, res) => {
         p.image,
         COALESCE(c.color_name, 'Unknown') AS color_name,
         COALESCE(i.quantity, 0) AS quantity,
-        COALESCE(i.status, 'not_assigned') AS status
+        COALESCE(i.status, 'not_assigned') AS status,
+        COALESCE(i.item_condition, 'UNKNOWN') AS item_condition
     FROM products p
     LEFT JOIN inventory_units i
         ON p.product_id = i.product_id
     LEFT JOIN colors c
         ON i.color_id = c.color_id
     ORDER BY p.name, p.model, c.color_name
-  `;
+    `;
 
   db.query(sql, (err, result) => {
     if (err) return res.status(500).json(err);
@@ -110,7 +149,8 @@ exports.getAllUnits = (req, res) => {
       const unitInfo = {
         color: r.color_name,
         quantity: Number(r.quantity),
-        status: r.status
+        status: r.status,
+        item_condition: r.item_condition
       };
 
       summary[r.product_id].units.push(unitInfo);

@@ -14,11 +14,9 @@ function Units() {
     product_id: "",
     color_id: "",
     quantity: "",
-    item_condition: "BRAND_NEW",
-    mop_id: ""
+    item_condition: "BRAND NEW",
   });
 
-  // ✅ PRODUCT WITH IMAGE
   const [productForm, setProductForm] = useState({
     name: "iPhone",
     model: "",
@@ -58,12 +56,10 @@ function Units() {
     setPaymentModes(paymentData);
   };
 
-  // ===== HANDLERS =====
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ✅ HANDLE FILE
   const handleProductChange = (e) => {
     const { name, value, files } = e.target;
 
@@ -82,7 +78,6 @@ function Units() {
     setPaymentForm({ ...paymentForm, [e.target.name]: e.target.value });
   };
 
-  // ===== SUBMIT UNIT =====
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -99,8 +94,7 @@ function Units() {
         product_id: "",
         color_id: "",
         quantity: "",
-        item_condition: "BRAND_NEW",
-        mop_id: ""
+        item_condition: "BRAND NEW",
       });
 
     } catch {
@@ -108,7 +102,6 @@ function Units() {
     }
   };
 
-  // ✅ CREATE PRODUCT WITH IMAGE
   const handleCreateProduct = async (e) => {
     e.preventDefault();
 
@@ -180,19 +173,13 @@ function Units() {
       <h2 className="add-unit-title">Inventory Management</h2>
 
       <div className="forms-grid">
-
-        {/* ===== ADD PRODUCT ===== */}
         <div className="add-unit-form">
           <h3>Add Product</h3>
           <form onSubmit={handleCreateProduct} encType="multipart/form-data">
             <input name="name" placeholder="Product Name" value={productForm.name} onChange={handleProductChange} required />
             <input name="model" placeholder="Model" value={productForm.model} onChange={handleProductChange} required />
             <input name="storage" placeholder="Storage" value={productForm.storage} onChange={handleProductChange} required />
-
-            {/* ✅ IMAGE INPUT */}
             <input type="file" name="image" accept="image/*" onChange={handleProductChange} required />
-
-            {/* ✅ PREVIEW */}
             {productForm.image && (
               <img
                 src={URL.createObjectURL(productForm.image)}
@@ -204,8 +191,6 @@ function Units() {
             <button type="submit">Add Product</button>
           </form>
         </div>
-
-        {/* ===== ADD COLOR ===== */}
         <div className="add-unit-form">
           <h3>Add Color</h3>
           <form onSubmit={handleCreateColor}>
@@ -214,7 +199,6 @@ function Units() {
           </form>
         </div>
 
-        {/* ===== ADD PAYMENT ===== */}
         <div className="add-unit-form">
           <h3>Add Payment Mode</h3>
           <form onSubmit={handleCreatePayment}>
@@ -247,8 +231,9 @@ function Units() {
             <input type="number" name="quantity" value={formData.quantity} onChange={handleChange} required />
 
             <select name="item_condition" value={formData.item_condition} onChange={handleChange}>
-              <option value="BRAND_NEW">BRAND NEW</option>
+              <option value="BRAND NEW">BRAND NEW</option>
               <option value="PREOWNED">PRE-OWNED</option>
+              <option value="ANDROID">ANDROID</option>
             </select>
 
             <button type="submit">Add Unit</button>

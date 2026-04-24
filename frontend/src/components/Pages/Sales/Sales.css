@@ -114,8 +114,6 @@
   text-align: center;
 }
 
-/* EXPENSE SECTION */
-
 .expenses-section {
   margin-top: 12px;
   font-size: 12px;
@@ -135,6 +133,77 @@
   padding-top: 6px;
   border-top: 2px solid #444;
   font-weight: bold;
+}
+
+.status-tag {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 3px 10px;
+  font-size: 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-sold {
+  background: #e6f7ee;
+  color: #1a7f4b;
+  border: 1px solid #b7ebc6;
+}
+
+.status-upgrade {
+  background: #fff4e5;
+  color: #b26a00;
+  border: 1px solid #ffd591;
+}
+
+.status-unknown {
+  background: #eee;
+  color: #666;
+  border: 1px solid #ccc;
+}
+
+.upgrade-text {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.upgrade-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.upgrade-old {
+  flex: 1;
+  color: #f87171;
+}
+
+.upgrade-new {
+  flex: 1;
+  text-align: right;
+  color: #34d399;
+}
+
+.upgrade-arrow {
+  font-size: 18px;
+  color: #60a5fa;
+}
+
+.label {
+  display: block;
+  font-size: 10px;
+  opacity: 0.6;
+  margin-bottom: 2px;
+}
+
+.expenses-section h2 {
+  margin-top: 12px;
+}
+
+.expenses-section {
+  border-top: 1px solid #333;
+  padding-top: 8px;
 }
 
 /* MOBILE */

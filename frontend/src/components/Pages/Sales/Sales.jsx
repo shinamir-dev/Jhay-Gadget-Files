@@ -16,12 +16,19 @@ const badgeClass = (method) => {
   return map[method] || "badge-other";
 };
 
+const statusClass = (status) => {
+  const map = {
+    sold: "status-sold",
+    upgrade: "status-upgrade",
+  };
+  return map[status?.toLowerCase()] || "status-unknown";
+};
+
 export default function Sales() {
   const [sales, setSales] = useState([]);
   const [summary, setSummary] = useState([]);
   const [expenses, setExpenses] = useState([]);
-  const [totalExpenses, setTotalExpenses] = useState(0);
-  const [netSales, setNetSales] = useState(0);
+  const [preorders, setPreorders] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -44,8 +51,7 @@ export default function Sales() {
         setSales(data.sales || []);
         setSummary(data.summary || []);
         setExpenses(data.expenses || []);
-        setTotalExpenses(data.total_expenses || 0);
-        setNetSales(data.net_sales || 0);
+        setPreorders(data.preorders || []);
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
@@ -65,18 +71,95 @@ export default function Sales() {
       </div>
     );
 
-  const totalSales = summary.reduce(
-    (s, r) => s + Number(r.total_sales || 0),
+  const totalSales = sales.reduce((sum, s) => {
+    return (
+      sum +
+      (s.payments || []).reduce(
+        (pSum, p) => pSum + Number(p.cash || 0) + Number(p.finance || 0),
+        0
+      )
+    );
+  }, 0);
+
+  const totalCashFromSales = sales.reduce((sum, s) => {
+    return (
+      sum +
+      (s.payments || []).reduce((pSum, p) => {
+        if (p.method === "Cash") {
+          return pSum + Number(p.cash || 0) + Number(p.finance || 0);
+        }
+        return pSum;
+      }, 0)
+    );
+  }, 0);
+
+  const totalPreorderCash = preorders.reduce((sum, p) => {
+    if (p.payment_method === "Cash") {
+      return sum + Number(p.payment || 0);
+    }
+    return sum;
+  }, 0);
+
+  const totalPreorders = preorders.reduce(
+    (sum, p) => sum + Number(p.payment || 0),
     0
   );
 
-  const totalTx = summary.reduce(
-    (s, r) => s + Number(r.total_transactions || 0),
+  const totalCashSales = totalCashFromSales + totalPreorderCash;
+  const totalNonCashSales = totalSales - totalCashFromSales;
+  const totalExpenses = expenses.reduce(
+    (sum, e) => sum + Number(e.amount || 0),
     0
   );
 
-  const grandQty = sales.reduce((s, r) => s + Number(r.quantity || 0), 0);
+  const remainingCash = totalCashSales - totalExpenses;
+  const netRevenue = totalSales + totalPreorders - totalExpenses;
 
+  const totalTx = sales.length;
+
+  const grandQty = sales.reduce(
+    (sum, s) => sum + (Number(s.quantity) || 1),
+    0
+  );
+
+  const preorderSummary = preorders.reduce((acc, p) => {
+    const method = p.payment_method || "Other";
+
+    if (!acc[method]) {
+      acc[method] = {
+        payment_method: method,
+        total_sales: 0,
+        total_transactions: 0,
+      };
+    }
+
+    acc[method].total_sales += Number(p.payment || 0);
+    acc[method].total_transactions += 1;
+
+    return acc;
+  }, {});
+
+  const mergedSummaryMap = {};
+
+  summary.forEach((s) => {
+    mergedSummaryMap[s.payment_method] = {
+      payment_method: s.payment_method,
+      total_sales: Number(s.total_sales || 0),
+      total_transactions: Number(s.total_transactions || 0),
+    };
+  });
+
+  Object.values(preorderSummary).forEach((p) => {
+    if (!mergedSummaryMap[p.payment_method]) {
+      mergedSummaryMap[p.payment_method] = { ...p };
+    } else {
+      mergedSummaryMap[p.payment_method].total_sales += p.total_sales;
+      mergedSummaryMap[p.payment_method].total_transactions +=
+        p.total_transactions;
+    }
+  });
+
+  const mergedSummary = Object.values(mergedSummaryMap);
   const formattedDate = new Date(selectedDate).toLocaleDateString("en-PH", {
     weekday: "long",
     year: "numeric",
@@ -89,25 +172,32 @@ export default function Sales() {
       <h1>Daily Sales Report</h1>
       <p className="date-label">{formattedDate}</p>
 
-    <div className="filter-bar">
-      <div className="date-control">
-        <label>Select Date</label>
-        <input
-          type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-        />
+      <div className="filter-bar">
+        <div className="date-control">
+          <label>Select Date</label>
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+          />
+        </div>
+
+        <button onClick={() => window.print()} className="print-btn">
+          Print / Save PDF
+        </button>
       </div>
 
-      <button onClick={() => window.print()} className="print-btn">
-        Print / Save PDF
-      </button>
-    </div>
-
-      {/* METRICS */}
       <div className="metrics-inline">
         <div>
           <span>Total Revenue:</span> <strong>{fmt(totalSales)}</strong>
+        </div>
+
+        <div>
+          <span>Cash Sales:</span> <strong>{fmt(totalCashSales)}</strong>
+        </div>
+
+        <div>
+          <span>Non-Cash Sales:</span> <strong>{fmt(totalNonCashSales)}</strong>
         </div>
 
         <div>
@@ -115,7 +205,11 @@ export default function Sales() {
         </div>
 
         <div>
-          <span>Net Revenue:</span> <strong>{fmt(netSales)}</strong>
+          <span>Cash Remaining:</span> <strong>{fmt(remainingCash)}</strong>
+        </div>
+
+        <div>
+          <span>Net Revenue:</span> <strong>{fmt(netRevenue)}</strong>
         </div>
 
         <div>
@@ -128,9 +222,9 @@ export default function Sales() {
       </div>
 
       <div className="summary-inline">
-        <h2>Sales by Payment Method</h2>
+        <h2>Sales & Pre-Orders by Payment Method</h2>
 
-        {summary.map((s) => (
+        {mergedSummary.map((s) => (
           <div className="summary-row" key={s.payment_method}>
             <span className={`tag ${badgeClass(s.payment_method)}`}>
               {s.payment_method}
@@ -138,12 +232,11 @@ export default function Sales() {
 
             <span>{s.total_transactions} txn</span>
 
-            <strong>{fmt(s.net_sales)}</strong>
+            <strong>{fmt(s.total_sales)}</strong>
           </div>
         ))}
       </div>
 
-      {/* EXPENSES SECTION */}
       <div className="expenses-section">
         <h2>Expenses</h2>
 
@@ -169,40 +262,101 @@ export default function Sales() {
         </div>
       </div>
 
-      {/* SALES LIST */}
+      <div className="expenses-section">
+        <h2>Pre-Orders</h2>
+
+        {preorders.length === 0 ? (
+          <p className="empty">No pre-orders recorded.</p>
+        ) : (
+          preorders.map((p) => (
+            <div key={p.preorder_id} className="expense-row">
+              <span>{p.item}</span>
+
+              <span className={`tag ${badgeClass(p.payment_method)}`}>
+                {p.payment_method}
+              </span>
+
+              <strong>{fmt(p.payment)}</strong>
+            </div>
+          ))
+        )}
+
+        <div className="expense-total">
+          <span>Total Pre-Orders</span>
+          <strong>{fmt(totalPreorders)}</strong>
+        </div>
+      </div>
+
       <div className="sales-list">
         <h2>Transaction Details</h2>
 
-        {sales.map((s) => (
-          <div className="sale-item" key={s.sales_id}>
-            <div className="sale-main">
-              <strong>{s.product_name}</strong>
-              <span className="sale-meta">
-                {s.model} • {s.color_name} • {s.storage}
-              </span>
-            </div>
+        {sales.map((s) => {
+          const isUpgrade = !!s.old_product_name;
 
-            <div className="sale-side">
-              <span>{s.quantity}x</span>
+          return (
+            <div className="sale-item" key={s.sales_id}>
+              <div className="sale-main">
+                {isUpgrade ? (
+                  <div className="upgrade-wrapper">
+                    <div className="upgrade-old">
+                      <span className="label">TRADE-IN</span>
+                      <strong>
+                        {s.old_product_name} {s.old_model}
+                      </strong>
+                      <div className="sale-meta">
+                        {s.old_storage || "N/A"} • {s.old_color} •{" "}
+                        {s.old_condition || "N/A"}
+                      </div>
+                    </div>
 
-              {s.payments.map((p) => (
-                <div key={p.sale_payment_id}>
-                  {p.cash > 0 && (
-                    <span className={`tag ${badgeClass("Cash")}`}>
-                      {p.method}: {fmt(p.cash)}
+                    <div className="upgrade-arrow">→</div>
+
+                    <div className="upgrade-new">
+                      <span className="label">UPGRADED TO</span>
+                      <strong>
+                        {s.product_name} {s.model}
+                      </strong>
+                      <div className="sale-meta">
+                        {s.storage} • {s.color_name}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <strong>{s.product_name}</strong>
+                    <span className="sale-meta">
+                      {s.model} • {s.color_name} • {s.storage}
                     </span>
-                  )}
+                  </>
+                )}
 
-                  {p.finance > 0 && (
-                    <span className={`tag ${badgeClass(p.method)}`}>
-                      {p.method}: {fmt(p.finance)}
-                    </span>
-                  )}
-                </div>
-              ))}
+                <span className={`status-tag ${statusClass(s.status)}`}>
+                  {isUpgrade ? "Upgrade" : s.status || "Sold"}
+                </span>
+              </div>
+
+              <div className="sale-side">
+                <span>{s.quantity}x</span>
+
+                {(s.payments || []).map((p) => (
+                  <div key={p.sale_payment_id}>
+                    {p.cash > 0 && (
+                      <span className={`tag ${badgeClass("Cash")}`}>
+                        {p.method}: {fmt(p.cash)}
+                      </span>
+                    )}
+
+                    {p.finance > 0 && (
+                      <span className={`tag ${badgeClass(p.method)}`}>
+                        {p.method}: {fmt(p.finance)}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

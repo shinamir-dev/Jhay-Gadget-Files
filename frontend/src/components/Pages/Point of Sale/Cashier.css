@@ -359,6 +359,147 @@
   background: #dc2626;
 }
 
+/* Upgrade Breakdown */
+.upgrade-breakdown {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #020617;
+  border: 1px solid #334155;
+  border-radius: 10px;
+}
+
+.upgrade-box {
+  padding: 10px;
+  margin-bottom: 6px;
+  border-radius: 6px;
+}
+
+.stock-in {
+  background: #052e16;
+  border: 1px solid #22c55e;
+}
+
+.stock-out {
+  background: #3f1d1d;
+  border: 1px solid #ef4444;
+}
+
+.upgrade-diff {
+  padding: 10px;
+  background: #1e293b;
+  border-radius: 6px;
+  color: #facc15;
+  font-weight: bold;
+}
+
+upgrade-list {
+  margin-top: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 4px;
+}
+
+/* scrollbar */
+.upgrade-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.upgrade-list::-webkit-scrollbar-track {
+  background: #020617;
+  border-radius: 10px;
+}
+
+.upgrade-list::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 10px;
+}
+
+.upgrade-list::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* upgrade item card */
+.upgrade-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #020617;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upgrade-card:hover {
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* selected state */
+.upgrade-card.selected {
+  border: 2px solid #f59e0b;
+  background: #1e293b;
+  box-shadow: 0 0 0 1px #f59e0b;
+}
+
+/* product image */
+.upgrade-card img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  background: #0f172a;
+  border-radius: 8px;
+  padding: 6px;
+  flex-shrink: 0;
+}
+
+/* text block */
+.upgrade-card h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #f8fafc;
+  font-weight: 700;
+}
+
+.upgrade-card p {
+  margin: 3px 0;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+/* summary section */
+.upgrade-summary {
+  margin-top: 1rem;
+  padding: 12px;
+  border-radius: 10px;
+  background: #1e293b;
+  border: 1px solid #334155;
+}
+
+.upgrade-summary p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+}
+
+.upgrade-summary p:last-child {
+  color: #facc15;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+/* modal width for bigger content */
+.modal-content {
+  max-width: 650px;
+  width: 95%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
 /* --------------------------
    Tablet
 --------------------------- */

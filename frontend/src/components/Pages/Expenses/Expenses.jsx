@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import "./Expenses.css";
 
 export default function Expenses() {
-  const [expense, setExpense] = useState("");
+  const [mode, setMode] = useState("expense"); 
+
+  const [name, setName] = useState(""); 
   const [amount, setAmount] = useState("");
   const [mopId, setMopId] = useState("");
 
@@ -12,7 +14,6 @@ export default function Expenses() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  // 🔹 Fetch payment methods
   useEffect(() => {
     fetch("http://192.168.1.252:5000/api/payment/get")
       .then((res) => res.json())
@@ -28,31 +29,47 @@ export default function Expenses() {
     setError("");
 
     try {
-      const res = await fetch(
-        "http://192.168.1.252:5000/api/expense/add",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            expense,
-            amount,
-            mop_id: mopId,
-          }),
-        }
-      );
+      const url =
+        mode === "expense"
+          ? "http://192.168.1.252:5000/api/expense/add"
+          : "http://192.168.1.252:5000/api/expense/preorder";
+
+      const body =
+        mode === "expense"
+          ? {
+              expense: name,
+              amount: Number(amount),
+              mop_id: mopId,
+            }
+          : {
+              item: name,
+              payment: Number(amount),
+              mop_id: mopId,
+            };
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
 
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message);
 
-      setMessage("✅ Expense added successfully!");
-      setExpense("");
+      setMessage(
+        mode === "expense"
+          ? "Expense added successfully!"
+          : "Pre-order added successfully!"
+      );
+
+      setName("");
       setAmount("");
       setMopId("");
     } catch (err) {
-      setError(err.message || "Error adding expense");
+      setError(err.message || "Error saving record");
     } finally {
       setLoading(false);
     }
@@ -60,33 +77,46 @@ export default function Expenses() {
 
   return (
     <div className="pos-container">
-      <h1>Add Expense</h1>
+      <h1>Records</h1>
 
       <div className="filter-bar">
-        <span className="date-label">
-          Record daily operational expenses
-        </span>
+        <button
+          onClick={() => setMode("expense")}
+          className={mode === "expense" ? "print-btn" : ""}
+        >
+          Expense
+        </button>
+        <button
+          onClick={() => setMode("preorder")}
+          className={mode === "preorder" ? "print-btn" : ""}
+        >
+          Pre-Order
+        </button>
       </div>
 
       <form className="sales-list" onSubmit={handleSubmit}>
-        {/* EXPENSE NAME */}
         <div className="sale-item">
           <div className="sale-main">
-            <label>Expense</label>
+            <label>{mode === "expense" ? "Expense" : "Item"}</label>
             <input
               type="text"
-              value={expense}
-              onChange={(e) => setExpense(e.target.value)}
-              placeholder="e.g. Transportation, Supplies"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={
+                mode === "expense"
+                  ? "e.g. Transportation, Supplies"
+                  : "e.g. iPhone 13, iPad Air"
+              }
               required
             />
           </div>
         </div>
 
-        {/* AMOUNT */}
         <div className="sale-item">
           <div className="sale-main">
-            <label>Amount</label>
+            <label>
+              {mode === "expense" ? "Amount" : "Payment"}
+            </label>
             <input
               type="number"
               value={amount}
@@ -97,7 +127,6 @@ export default function Expenses() {
           </div>
         </div>
 
-        {/* PAYMENT METHOD */}
         <div className="sale-item">
           <div className="sale-main">
             <label>Payment Method</label>
@@ -116,14 +145,16 @@ export default function Expenses() {
           </div>
         </div>
 
-        {/* BUTTON */}
         <div className="sale-total">
           <button className="print-btn" type="submit" disabled={loading}>
-            {loading ? "Saving..." : "Add Expense"}
+            {loading
+              ? "Saving..."
+              : mode === "expense"
+              ? "Add Expense"
+              : "Add Pre-Order"}
           </button>
         </div>
 
-        {/* FEEDBACK */}
         {message && <p className="tag badge-cash">{message}</p>}
         {error && <p className="error">{error}</p>}
       </form>

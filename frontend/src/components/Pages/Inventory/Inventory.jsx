@@ -46,15 +46,12 @@ function Inventory() {
         setStatus(type);
     };
 
-    // ✅ PRINT FUNCTION
     const handlePrint = () => {
         window.print();
     };
 
     return (
         <div className="report-table">
-
-            {/* HEADER */}
             <div className="header-row">
                 <h2 className="h2-report">
                     JHAY GADGET INVENTORY ({status.toUpperCase()})
@@ -66,15 +63,9 @@ function Inventory() {
             </div>
 
             <div className="category-buttons">
-                <button onClick={() => handleButtonCategory("available")}>
-                    Available
-                </button>
-                <button onClick={() => handleButtonCategory("sold")}>
-                    Sold
-                </button>
-                <button onClick={() => handleButtonCategory("defective")}>
-                    Defective
-                </button>
+                <button onClick={() => handleButtonCategory("preowned")}>Preowned</button>
+                <button onClick={() => handleButtonCategory("brandnew")}>Brand New</button>
+                <button onClick={() => handleButtonCategory("android")}>Android</button>
             </div>
 
             <div className="table-wrapper">

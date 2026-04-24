@@ -14,13 +14,44 @@ export default function Cashier() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // 🔥 Upgrade modal state
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [selectedUpgrade, setSelectedUpgrade] = useState("");
+  const [upgradeOptions, setUpgradeOptions] = useState([]);
+  const [selectedUpgrade, setSelectedUpgrade] = useState(null);
+
+  const [upgradePayment, setUpgradePayment] = useState({
+    mop_id: "",
+    amount: "",
+  });
+
+  const [customerUnit, setCustomerUnit] = useState({
+    product_id: "",
+    color_id: "",
+    item_condition: "",
+    amount: "",
+    mop_id: "",
+  });
 
   const [payments, setPayments] = useState([
     { mop_id: "", amount: "" }
   ]);
+
+  const fetchUpgradeOptions = async () => {
+    try {
+      const res = await axios.get(
+        "http://192.168.1.252:5000/api/payment/get/option",
+        {
+          params: {
+            product_id: data.product_id,
+          },
+        }
+      );
+
+      setUpgradeOptions(res.data);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to load upgrade products.");
+    }
+  };
 
   useEffect(() => {
     if (product && unit) {
@@ -44,6 +75,39 @@ export default function Cashier() {
     } catch (err) {
       console.error(err);
       alert("Failed to load product details.");
+    }
+  };
+
+  const handleUpgrade = async () => {
+    try {
+      const payload = {
+        product_id: data.product_id,
+        color_id: data.color_id,
+
+        payments: [
+          {
+            mop_id: customerUnit.mop_id,
+            amount: Number(customerUnit.amount)
+          }
+        ],
+
+        product_id2: customerUnit.product_id,
+        color_id2: customerUnit.color_id,
+        item_condition: customerUnit.item_condition,
+      };
+
+      console.log("UPGRADE PAYLOAD:", payload);
+
+      await axios.post(
+        "http://192.168.1.252:5000/api/payment/upgrade",
+        payload
+      );
+
+      alert("Upgrade successful");
+      setShowUpgradeModal(false);
+    } catch (err) {
+      console.error(err);
+      alert("Upgrade failed");
     }
   };
 
@@ -119,7 +183,7 @@ export default function Cashier() {
           color_id: data.color_id,
           quantity,
           total,
-          upgrade: selectedUpgrade || null, // 🔥 send upgrade
+          upgrade: selectedUpgrade || null, 
           payments: paymentData,
         }
       );
@@ -159,7 +223,6 @@ export default function Cashier() {
           <p>Available Stock: {data.quantity}</p>
           <p>Price: ₱{Number(data.price) || 0}</p>
 
-          {/* ✅ Show selected upgrade */}
           {selectedUpgrade && (
             <p style={{ color: "#facc15" }}>
               Upgrade: {selectedUpgrade}
@@ -190,11 +253,13 @@ export default function Cashier() {
               }>+</button>
             </div>
 
-            {/* 🔘 Upgrade Button */}
             <button
               className="upgrade-btn"
-              onClick={() => setShowUpgradeModal(true)}
-            >
+              onClick={() => {
+                fetchUpgradeOptions();
+                setShowUpgradeModal(true);
+              }}
+              >
               ⬆ Upgrade
             </button>
 
@@ -262,39 +327,132 @@ export default function Cashier() {
         </div>
       </div>
 
-      {/* 🪟 UPGRADE MODAL */}
       {showUpgradeModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>Upgrade Product</h2>
+      <div className="modal-overlay">
+        <div className="modal-content">
+          <h2>Trade-in Upgrade</h2>
 
-            <select
-              value={selectedUpgrade}
-              onChange={(e) => setSelectedUpgrade(e.target.value)}
-            >
-              <option value="">Select Upgrade</option>
-              <option value="Premium">Premium</option>
-              <option value="Pro">Pro</option>
-            </select>
-
-            <div className="modal-actions">
-              <button
-                className="confirm-btn"
-                onClick={() => setShowUpgradeModal(false)}
-              >
-                Confirm
-              </button>
-
-              <button
-                className="cancel-btn"
-                onClick={() => setShowUpgradeModal(false)}
-              >
-                Cancel
-              </button>
+          <div className="upgrade-breakdown">
+            <div className="upgrade-box stock-out">
+              <strong>Upgrade Unit (Stock Out)</strong>
+              <p>{data.name}</p>
+              <p>{data.model}</p>
+              <p>{data.storage}</p>
+              <p>{data.color_name}</p>
+              <p>₱{data.price}</p>
             </div>
           </div>
+
+          <label>Customer Unit Product</label>
+          <select
+            value={customerUnit.product_id}
+            onChange={(e) =>
+              setCustomerUnit({
+                ...customerUnit,
+                product_id: Number(e.target.value),
+                color_id: ""  
+              })
+            }
+          >
+            <option value="">Select Product</option>
+
+            {[...new Map(
+              upgradeOptions.map(item => [item.product_id, item])
+            ).values()].map((item) => (
+              <option key={item.product_id} value={item.product_id}>
+                {item.name} {item.model} {item.storage}
+              </option>
+            ))}
+          </select>
+
+          <label>Customer Unit Color</label>
+          <select
+            value={customerUnit.color_id}
+            onChange={(e) =>
+              setCustomerUnit({
+                ...customerUnit,
+                color_id: Number(e.target.value),
+              })
+            }
+          >
+            <option value="">Select Color</option>
+
+            {upgradeOptions
+            .filter(
+              (item) =>
+                item.product_id === customerUnit.product_id
+            )
+            .map((item) => (
+              <option
+                key={`${item.product_id}-${item.color_id}`}
+                value={item.color_id}
+              >
+                {item.color_name}
+              </option>
+            ))}
+          </select>
+
+          <label>Condition</label>
+          <select
+            value={customerUnit.item_condition}
+            onChange={(e) =>
+              setCustomerUnit({
+                ...customerUnit,
+                item_condition: e.target.value,
+              })
+            }
+          >
+            <option value="">Select Condition</option>
+            <option value="PREOWNED">Preowned</option>
+            <option value="BRAND NEW">Brand New</option>
+          </select>
+
+          <label>Additional Payment</label>
+          <input
+            type="number"
+            placeholder="Enter additional amount"
+            value={customerUnit.amount}
+            onChange={(e) =>
+              setCustomerUnit({
+                ...customerUnit,
+                amount: e.target.value,
+              })
+            }
+          />
+
+          <label>Mode of Payment</label>
+          <select
+            value={customerUnit.mop_id}
+            onChange={(e) =>
+              setCustomerUnit({
+                ...customerUnit,
+                mop_id: Number(e.target.value),
+              })
+            }
+          >
+            <option value="">Select Payment</option>
+            {paymentMethods.map((method) => (
+              <option key={method.mop_id} value={method.mop_id}>
+                {method.payment_method}
+              </option>
+            ))}
+          </select>
+
+          <div className="modal-actions">
+            <button className="confirm-btn" onClick={handleUpgrade}>
+              Confirm Upgrade
+            </button>
+
+            <button
+              className="cancel-btn"
+              onClick={() => setShowUpgradeModal(false)}
+            >
+              Cancel
+            </button>
+          </div>
         </div>
-      )}
+      </div>
+    )}
     </div>
   );
 }
