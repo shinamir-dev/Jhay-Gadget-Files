@@ -15,7 +15,7 @@ export default function Expenses() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("http://192.168.1.252:5000/api/payment/get")
+    fetch("http://192.168.254.196:5000/api/payment/get")
       .then((res) => res.json())
       .then((data) => setMopList(data))
       .catch(() => setMopList([]));
@@ -31,8 +31,8 @@ export default function Expenses() {
     try {
       const url =
         mode === "expense"
-          ? "http://192.168.1.252:5000/api/expense/add"
-          : "http://192.168.1.252:5000/api/expense/preorder";
+          ? "http://192.168.254.196:5000/api/expense/add"
+          : "http://192.168.254.196:5000/api/expense/preorder";
 
       const body =
         mode === "expense"

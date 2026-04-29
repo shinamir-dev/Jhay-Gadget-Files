@@ -1,0 +1,281 @@
+/* ── Overlay ── */
+.receipt-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.82);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  z-index: 1000;
+  padding: 1.5rem 1rem;
+  overflow-y: auto;
+  contain: layout;
+}
+
+/* ── Modal wrapper ── */
+.receipt-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.landscape-modal {
+  max-width: 900px;
+}
+
+/* ── Action buttons ── */
+.receipt-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.print-action-btn,
+.close-action-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 0.88rem;
+}
+
+.print-action-btn {
+  background: #2563eb;
+  color: #fff;
+}
+
+.print-action-btn:hover { background: #1d4ed8; }
+
+.close-action-btn {
+  background: #475569;
+  color: #fff;
+}
+
+.close-action-btn:hover { background: #334155; }
+
+/* ── Landscape two-column preview ── */
+.receipt-landscape-preview {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #f9f6ef;
+  color: #1a1a1a;
+  border: 1px solid #bbb;
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: 10px;
+  line-height: 1.5;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* ── Left column ── */
+.col-left {
+  padding: 12px 16px;
+  border-right: 1px dashed #999;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Right column ── */
+.col-right {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Typography ── */
+.shop-name {
+  text-align: center;
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  line-height: 1.5;
+  margin-bottom: 2px;
+}
+
+.shop-sub {
+  text-align: center;
+  font-size: 8.5px;
+  color: #444;
+  line-height: 1.4;
+  margin-bottom: 2px;
+}
+
+.invoice-title {
+  text-align: center;
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  margin: 5px 0 1px;
+}
+
+.invoice-num {
+  text-align: center;
+  font-size: 11px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.divider {
+  border: none;
+  border-top: 1px dashed #888;
+  margin: 4px 0;
+}
+
+.divider-solid {
+  border: none;
+  border-top: 1px solid #555;
+  margin: 4px 0;
+}
+
+/* ── Info rows ── */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  margin: 1px 0;
+  gap: 6px;
+}
+
+.info-label {
+  color: #555;
+  min-width: 55px;
+  flex-shrink: 0;
+}
+
+.info-value {
+  text-align: right;
+  flex: 1;
+}
+
+/* ── Items table ── */
+.items-header {
+  display: grid;
+  grid-template-columns: 28px 1fr 70px;
+  font-size: 9px;
+  font-weight: bold;
+  border-bottom: 1px solid #555;
+  padding-bottom: 3px;
+  margin-bottom: 3px;
+}
+
+.item-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 70px;
+  font-size: 9px;
+  margin: 3px 0;
+  align-items: start;
+}
+
+.item-desc {
+  font-size: 8.5px;
+  color: #222;
+  line-height: 1.45;
+}
+
+.item-amount {
+  text-align: right;
+  font-size: 9px;
+}
+
+/* ── Totals ── */
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  margin: 1px 0;
+}
+
+.total-row.bold {
+  font-weight: bold;
+  font-size: 10px;
+  margin: 2px 0;
+}
+
+/* ── Payments ── */
+.payments-header {
+  text-align: center;
+  font-size: 9px;
+  margin: 4px 0 2px;
+  letter-spacing: 1px;
+}
+
+.payment-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  margin: 1px 0;
+}
+
+/* ── Footer ── */
+.footer-text {
+  font-size: 8px;
+  color: #444;
+  margin-top: 8px;
+  line-height: 1.55;
+}
+
+/* ── Signatures ── */
+.sig-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.sig-block {
+  text-align: center;
+  flex: 1;
+}
+
+.sig-line {
+  border-top: 1px solid #555;
+  margin: 0 8px;
+  padding-top: 3px;
+  font-size: 8px;
+  color: #444;
+}
+
+.page-info {
+  text-align: center;
+  font-size: 8px;
+  color: #555;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+/* ── Responsive: stack on small screens ── */
+@media (max-width: 640px) {
+  .receipt-landscape-preview {
+    grid-template-columns: 1fr;
+    font-size: 9px;
+  }
+
+  .col-left {
+    border-right: none;
+    border-bottom: 1px dashed #999;
+  }
+}
+
+/* ── Print ── */
+@media print {
+  .receipt-overlay {
+    position: static;
+    background: none;
+    padding: 0;
+  }
+
+  .receipt-actions {
+    display: none;
+  }
+
+  .receipt-landscape-preview {
+    box-shadow: none;
+    width: 100%;
+    font-size: 9px;
+  }
+}

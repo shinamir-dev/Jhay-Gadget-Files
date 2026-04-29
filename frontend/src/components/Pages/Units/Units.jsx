@@ -14,6 +14,7 @@ function Units() {
     product_id: "",
     color_id: "",
     quantity: "",
+    serial_number: "",
     item_condition: "BRAND NEW",
   });
 
@@ -94,6 +95,7 @@ function Units() {
         product_id: "",
         color_id: "",
         quantity: "",
+        serial_number: "",
         item_condition: "BRAND NEW",
       });
 
@@ -229,11 +231,13 @@ function Units() {
             </select>
 
             <input type="number" name="quantity" value={formData.quantity} onChange={handleChange} required />
+            <input type="text" name="serial_number" value={formData.serial_number} onChange={handleChange}/>
 
             <select name="item_condition" value={formData.item_condition} onChange={handleChange}>
               <option value="BRAND NEW">BRAND NEW</option>
               <option value="PREOWNED">PRE-OWNED</option>
               <option value="ANDROID">ANDROID</option>
+              <option value="PARTS">PARTS</option>
             </select>
 
             <button type="submit">Add Unit</button>
@@ -242,7 +246,6 @@ function Units() {
 
       </div>
 
-      {/* MODAL */}
       {modal.show && (
         <div className="modal-overlay">
           <div className={`modal-box ${modal.type}`}>

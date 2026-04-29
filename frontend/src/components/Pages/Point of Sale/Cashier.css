@@ -500,6 +500,67 @@ upgrade-list {
   overflow-y: auto;
 }
 
+.serial-field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.serial-field input {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #1e1e2e;
+  color: #fff;
+  font-size: 0.9rem;
+  width: 100%;
+}
+
+.serial-hint {
+  color: #888;
+  font-size: 0.75rem;
+}
+
+.serial-dropdown {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  background: #2a2a3d;
+  border: 1px solid #555;
+  border-radius: 6px;
+  max-height: 180px;
+  overflow-y: auto;
+  z-index: 100;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+}
+
+.serial-dropdown li {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #e2e8f0;
+}
+
+.serial-dropdown li:hover {
+  background: #3b3b55;
+}
+
+.serial-new {
+  color: #aaa !important;
+  font-style: italic;
+  cursor: default !important;
+}
+
+.serial-new:hover {
+  background: transparent !important;
+}
+
 /* --------------------------
    Tablet
 --------------------------- */

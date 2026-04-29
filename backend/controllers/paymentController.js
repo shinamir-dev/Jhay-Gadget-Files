@@ -60,18 +60,18 @@ exports.getUnitDetails = (req, res) => {
 };
 
 exports.checkoutSale = (req, res) => {
-    const { product_id, color_id, quantity, total, payments } = req.body;
-
+    const { product_id, color_id, quantity, serial_number, total, payments } = req.body;
+    console.log(req.body);
     db.beginTransaction((err) => {
         if (err) return res.status(500).json(err);
 
         const saleSql = `
             INSERT INTO sales 
-            (product_id, color_id, quantity, total, status_id)
-            VALUES (?, ?, ?, ?, ?)
+            (product_id, color_id, quantity, serial_number, total, status_id)
+            VALUES (?, ?, ?, ?, ?, ?)
         `;
 
-        db.query(saleSql, [product_id, color_id, quantity, total, 2], (err, result) => {
+        db.query(saleSql, [product_id, color_id, quantity, serial_number, total, 4], (err, result) => {
             if (err) {
                 return db.rollback(() => {
                     res.status(500).json(err);
@@ -170,7 +170,7 @@ exports.upgradeUnit = (req, res) => {
 
     const quantity = 1;
     const total = amount;
-    const STATUS_ID = 1;
+    const STATUS_ID = 3;
 
     db.beginTransaction((err) => {
         if (err) return res.status(500).json(err);

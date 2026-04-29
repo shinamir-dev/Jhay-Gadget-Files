@@ -41,7 +41,7 @@ export default function Sales() {
     setLoading(true);
 
     fetch(
-      `http://192.168.1.252:5000/api/sale/get/summary?date=${selectedDate}`
+      `http://192.168.254.196:5000/api/sale/get/summary?date=${selectedDate}`
     )
       .then((r) => {
         if (!r.ok) throw new Error("Failed to load sales data");

@@ -5,45 +5,89 @@ exports.addUnit = (req, res) => {
         product_id,
         color_id,
         quantity,
+        serial_number,
         item_condition,
     } = req.body;
 
     console.log(req.body);
 
-    let status = "available";
-
-    if (Number(quantity) === 0) {
-        status = "no stock";
-    }
-
-    const sql = `
-        INSERT INTO inventory_units
-        (product_id, color_id, quantity, item_condition, status)
-        VALUES (?, ?, ?, ?, ?)
+    const checkSql = `
+        SELECT * FROM inventory_units
+        WHERE product_id = ? AND color_id = ? AND item_condition = ?
+        LIMIT 1
     `;
 
     db.query(
-        sql,
-        [
-            product_id,
-            color_id,
-            quantity,
-            item_condition,
-            status,
-        ],
-        (error, result) => {
-            if (error) {
-                return res.status(500).json(error);
+        checkSql,
+        [product_id, color_id, item_condition],
+        (err, results) => {
+            if (err) {
+                return res.status(500).json(err);
             }
 
-            res.json({
-                message: "Unit added successfully!",
-                status
-            });
+            if (results.length > 0) {
+                const existing = results[0];
+                const newQuantity = existing.quantity + Number(quantity);
+
+                let status = newQuantity === 0 ? "no stock" : "available";
+
+                const updateSql = `
+                    UPDATE inventory_units
+                    SET quantity = ?, status = ?
+                    WHERE inventory_id = ?
+                `;
+
+                db.query(
+                    updateSql,
+                    [newQuantity, status, existing.inventory_id],
+                    (error) => {
+                        if (error) {
+                            return res.status(500).json(error);
+                        }
+
+                        return res.json({
+                            message: "Stock updated successfully!",
+                            quantity: newQuantity,
+                            status
+                        });
+                    }
+                );
+            } 
+
+            else {
+                let status = Number(quantity) === 0 ? "no stock" : "available";
+
+                const insertSql = `
+                    INSERT INTO inventory_units
+                    (product_id, color_id, quantity, serial_number, item_condition, status)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                `;
+
+                db.query(
+                    insertSql,
+                    [
+                        product_id,
+                        color_id,
+                        quantity,
+                        serial_number,
+                        item_condition,
+                        status,
+                    ],
+                    (error) => {
+                        if (error) {
+                            return res.status(500).json(error);
+                        }
+
+                        res.json({
+                            message: "Unit added successfully!",
+                            status
+                        });
+                    }
+                );
+            }
         }
     );
 };
-
 exports.getSummary = (req, res) => {
   const filter = req.query.status || "preowned";
 
@@ -228,4 +272,26 @@ exports.saleUnit = (req, res) => {
             );
         });
     });
+};
+
+exports.getSerials = (req, res) => {
+  const { product_id, color_id, search = "" } = req.query;
+
+  const sql = `
+    SELECT inventory_id, serial_number
+    FROM inventory_units
+    WHERE product_id = ?
+      AND color_id = ?
+      AND status = 'available'
+      AND serial_number IS NOT NULL
+      AND serial_number != ''
+      AND serial_number LIKE ?
+    ORDER BY serial_number ASC
+    LIMIT 20
+  `;
+
+  db.query(sql, [product_id, color_id, `%${search}%`], (err, results) => {
+    if (err) return res.status(500).json(err);
+    res.json(results);
+  });
 };

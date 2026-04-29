@@ -1,4 +1,4 @@
-const API_URL = `http://192.168.1.252:5000/api/auth`
+const API_URL = `http://192.168.254.196:5000/api/auth`
 
 export const register = async (userData) => {
   try {
